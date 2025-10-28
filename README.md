@@ -36,15 +36,23 @@ Above is the project structure for a Transformer-based machine translation model
 
 ## Environment Setup
 
-* python >= 3.10
-
 ```bash
 pip install -r requirements.txt
 ```
 
+* python >= 3.10
+* torchtext==0.16.2
+* torchdata==0.7.1
+* torch==2.1.2+cu118
+* nltk==3.9.2
+* numpy==1.26.4
+* pandas==2.3.3
+* pyyaml
+
+
 ## Usage
 To train the model, run:
-
+    
 ```bash
 python main.py --mode train --gpu 0
 ```
