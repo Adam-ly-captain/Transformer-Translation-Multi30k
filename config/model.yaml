@@ -20,6 +20,6 @@ transformer:
     early_stopping_patience: 5
     eval_interval: 5
     checkpoint_path: ./results/checkpoints/
-    pretrained_path: ./results/checkpoints/transformer_30_2025-10-28 19-58-52_checkpoint.pt
+    pretrained_path: ./results/checkpoints/transformer_70_2025-10-28 22-54-16_checkpoint.pt
     device: cuda
     seed: 2025

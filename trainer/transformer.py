@@ -82,3 +82,26 @@ class TransformerTrainer(BaseTrainer):
                 )
 
         return total_loss / len(self.val_loader), bleu_scores / len(self.val_loader)
+        
+    def test(self):
+        self.model.eval()
+        bleu_scores = 0
+        with torch.no_grad():
+            self.log(f"Starting testing ...", mode='test')
+            for batch in tqdm.tqdm(self.test_loader, desc="Testing"):
+                src, tgt_shift, tgt = batch
+                src, tgt_shift, tgt = src.to(self.device), tgt_shift.to(self.device), tgt.to(self.device)
+
+                generated, logits = self.model((src, tgt_shift, tgt), mode='predict')
+                
+                bleu_scores += NLPMetrics.bleu_score_batch(
+                    references=tgt, hypotheses=generated,
+                    sos_token_id=self.test_loader.get_dataset_config()['sos_idx'],
+                    eos_token_id=self.test_loader.get_dataset_config()['eos_idx'],
+                    pad_token_id=self.test_loader.get_dataset_config()['pad_idx']
+                )
+
+        bleu_scores /= len(self.test_loader)
+        self.log(f"Test BLEU-4 Score: {bleu_scores}", mode='test')
+            
+        return bleu_scores
