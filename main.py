@@ -57,7 +57,7 @@ if __name__ == "__main__":
         generator=generator,
         worker_init_fn=seed_worker
     )
-    log("Training data loader initialized. Number of records: {}".format(len(train_loader.dataset)))
+    train_loader.log("Training data loader initialized. Number of records: {}".format(len(train_loader.dataset)))
     valid_loader = loader_class(
         dataset=valid_dataset,
         batch_size=model_config.get("batch_size", 32),
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         generator=generator,
         worker_init_fn=seed_worker
     )
-    log("Validation data loader initialized. Number of records: {}".format(len(valid_loader.dataset)))
+    valid_loader.log("Validation data loader initialized. Number of records: {}".format(len(valid_loader.dataset)))
     test_loader = loader_class(
         dataset=test_dataset, 
         batch_size=model_config.get("batch_size", 32),
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         generator=generator,
         worker_init_fn=seed_worker
     )
-    log("Test data loader initialized. Number of records: {}".format(len(test_loader.dataset)))
+    test_loader.log("Test data loader initialized. Number of records: {}".format(len(test_loader.dataset)))
 
     # init model instance
     model_class = getattr(model_zoo, model_config.get("model_class_name"))

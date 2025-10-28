@@ -21,7 +21,7 @@ class MMTDataset(BaseDataset):
         src_sentence, tgt_sentence = self.data[index]
         if self.dataset_type == 'train':
             return self.convert_src_sentence_to_indices('<sos> ' + src_sentence), \
-                    self.convert_src_sentence_to_indices('<sos> ' + tgt_sentence), \
+                    self.convert_tgt_sentence_to_indices('<sos> ' + tgt_sentence), \
                     self.convert_tgt_sentence_to_indices(tgt_sentence + ' <eos>')
         else:
             return self.convert_src_sentence_to_indices('<sos> ' + src_sentence), \
@@ -61,12 +61,12 @@ class MMTDataset(BaseDataset):
             src, tgt = sentences
             for word in src.split():
                 if word not in src_vocab_set:
-                    src_vocab.append(re.sub(r'[^\w\s]', '', word).lower())
+                    src_vocab.append(re.sub(r'(?<!<)[^\w\s<>](?!>)', '', word).lower())
                     src_vocab_set.add(word)
 
             for word in tgt.split():
                 if word not in tgt_vocab_set:
-                    tgt_vocab.append(re.sub(r'[^\w\s]', '', word).lower())
+                    tgt_vocab.append(re.sub(r'(?<!<)[^\w\s<>](?!>)', '', word).lower())
                     tgt_vocab_set.add(word)
 
         with open(f'{self.processed_data_path}/src_vocab_temp.txt', 'w') as f:
@@ -91,7 +91,7 @@ class MMTDataset(BaseDataset):
     def convert_src_sentence_to_indices(self, sentence):
         indices = []
         for word in sentence.split():
-            word = word = re.sub(r'[^\w\s]', '', word).lower()
+            word = re.sub(r'(?<!<)[^\w\s<>](?!>)', '', word).lower()
             if word in self.src_vocab:
                 indices.append(self.src_vocab.index(word))
             else:
@@ -101,7 +101,7 @@ class MMTDataset(BaseDataset):
     def convert_tgt_sentence_to_indices(self, sentence):
         indices = []
         for word in sentence.split():
-            word = re.sub(r'[^\w\s]', '', word).lower()
+            word = re.sub(r'(?<!<)[^\w\s<>](?!>)', '', word).lower()
             if word in self.tgt_vocab:
                 indices.append(self.tgt_vocab.index(word))
             else:

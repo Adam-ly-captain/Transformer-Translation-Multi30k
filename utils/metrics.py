@@ -12,7 +12,7 @@ class NLPMetrics:
                 continue
             if token == eos_token_id:
                 break  # 到 eos 就停下
-            cleaned.append(token)
+            cleaned.append(int(token))
         return cleaned
 
     @staticmethod
@@ -43,5 +43,5 @@ class NLPMetrics:
         return total_score / batch_size
 
 # reference = [[3, 7]]
-# candidate = [3, 7]
+# candidate = [4, 3, 7, 3, 3, 3,3,3,3]
 # print(NLPMetrics.bleu_score(reference[0], candidate))
