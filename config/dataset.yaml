@@ -1,0 +1,11 @@
+Multi30k:
+  dataset_class_name: MMTDataset
+  loader_class_name: MMTDataLoader
+  train:
+    num_workers: 4
+  valid:
+    num_workers: 4
+  test:
+    num_workers: 4
+  raw_data_path: ~/.cache/torch/text/datasets/Multi30k/
+  processed_data_path: ./data/multi30k/processed/

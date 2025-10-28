@@ -1,0 +1,2 @@
+torchtext==0.16.2
+torch==2.1.2+cu118

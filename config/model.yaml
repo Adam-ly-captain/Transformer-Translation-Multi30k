@@ -1,0 +1,24 @@
+transformer:
+    task: sequence_to_sequence
+    model_class_name: Transformer
+    trainer_class_name: TransformerTrainer
+    optimizer: adam
+    criterion: cross_entropy
+    num_epochs: 200
+    nhead: 8
+    num_encoder_layers: 6
+    num_decoder_layers: 6
+    dim_encoder_feedforward: [128, 256, 128]
+    dim_decoder_feedforward: [128, 256, 128]
+    dropout: 0.1
+    activation: relu
+    batch_size: 128
+    learning_rate: 0.0001
+    weight_decay: 0.00001
+    max_grad_norm: 1.0
+    word_dim: 128
+    early_stopping_patience: 5
+    eval_interval: 5
+    checkpoint_path: ./results/checkpoints/
+    device: cuda
+    seed: 2025
