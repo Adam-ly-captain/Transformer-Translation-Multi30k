@@ -17,10 +17,10 @@ def log(message):
 def init():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, default='./config/', help='The config directory.')
-    parser.add_argument('--mode', type=str, default='train', help='The mode to run.')
+    parser.add_argument('--mode', type=str, default='test', help='The mode to run.')
     parser.add_argument('--dataset', type=str, default='Multi30k', help='The dataset to use.')
     parser.add_argument('--model', type=str, default='transformer', help='The model to use.')
-    parser.add_argument('--pretrained', type=bool, default=False, help='Whether to use a pretrained model.')
+    parser.add_argument('--pretrained', type=bool, default=True, help='Whether to use a pretrained model.')
     parser.add_argument('--gpu', type=int, default=0, help='The gpu index, -1 for cpu')
     args = vars(parser.parse_args())
      

@@ -224,7 +224,7 @@ class Transformer(BaseModel):
         elif mode == 'predict':
             return self.predict(x)
 
-    def predict(self, x):
+    def predict(self, x, beam_size=5):
         # auto-regressive prediction
         src, tgt_start, tgt = x
         src = src.to(self.device)
@@ -240,24 +240,56 @@ class Transformer(BaseModel):
             src_emb = encoder(src_emb, src_padding_mask)
 
         batch_size = src.size(0)
-        generated = torch.zeros((batch_size, tgt_max_len + 1), dtype=torch.long, device=self.device)  # +1 for start token
-        generated[:, 0] = tgt_start[:, 0]
+        beam_candidates = [
+            (
+                torch.ones((batch_size, 1), dtype=torch.long, device=self.device), 
+                torch.zeros(batch_size, dtype=torch.float, device=self.device)
+            ) for _ in range(beam_size)
+        ]
+
+        # generated = torch.ones((batch_size, tgt_max_len + 1), dtype=torch.long, device=self.device)  # +1 for start token
+        # generated[:, 0] = tgt_start[:, 0]
         for t in range(1, tgt_max_len + 1):
-            tgt_input = generated[:, :t]
-            tgt_padding_mask = tgt_input == 0
-            tgt_emb = self.tgt_word_embedding(tgt_input)
+            temp_candidates = []
+            for seq, score in beam_candidates:
+                tgt_input = seq
+                tgt_padding_mask = tgt_input == 0
+                
+                tgt_emb = self.tgt_word_embedding(tgt_input)
+                tgt_emb = tgt_emb + tgt_pe[:t, :]  # element-wise addition
 
-            tgt_emb = tgt_emb + tgt_pe[:t, :]  # element-wise addition
+                for decoder in self.decoders:
+                    tgt_emb = decoder(tgt_emb, src_emb, tgt_padding_mask, src_padding_mask)
 
-            for decoder in self.decoders:
-                tgt_emb = decoder(tgt_emb, src_emb, tgt_padding_mask, src_padding_mask)
+                logits = self.final_linear(tgt_emb)
+                prob = torch.softmax(logits, dim=-1)
+                topk_probs, topk_indices = torch.topk(prob[:, -1, :], beam_size)
+                # print(topk_indices.shape)
+                for i in range(beam_size):
+                    next_seq = torch.cat((seq, topk_indices[:, i].unsqueeze(1)), dim=-1)
+                    next_score = score + topk_probs[:, i]
+                    temp_candidates.append((next_seq, next_score))
 
-            logits = self.final_linear(tgt_emb)
-            prob = torch.softmax(logits, dim=-1)
-            next_token = torch.argmax(prob[:, -1, :], dim=-1)
-            generated[:, t] = next_token
+            beam_candidates = self.beam_search_sorted(batch_size, temp_candidates, beam_size=beam_size)
 
             # if (next_token == self.dataset_config.get("eos_idx", 2)).all():
             #     break
-            
-        return generated, logits
+
+        return self.beam_search_sorted(batch_size, beam_candidates, beam_size=1)[0][0], logits
+
+    def beam_search_sorted(self, batch_size, beam_candidates, beam_size=5):
+        # Sort the beam candidates by their scores
+        new_candidates = [(torch.tensor([], dtype=torch.long).to(self.device), torch.tensor([], dtype=torch.float).to(self.device)) for _ in range(beam_size)]
+        for i in range(batch_size):
+            sample_scores = []
+            for seq, score in beam_candidates:
+                sample_scores.append(score[i])
+
+            _, indices = torch.topk(torch.tensor(sample_scores), beam_size)
+            for beam_idx, idx in enumerate(indices):
+                new_candidates[beam_idx] = (
+                    torch.cat((new_candidates[beam_idx][0], beam_candidates[idx][0][i].unsqueeze(0)), dim=0),
+                    torch.cat((new_candidates[beam_idx][1], beam_candidates[idx][1][i].unsqueeze(0)), dim=0)
+                )
+                
+        return new_candidates
