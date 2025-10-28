@@ -1,6 +1,7 @@
 # Transformer-Translation-Multi30k
 
 ## Project Overview
+```bash
 ./
 ├── config
 │   ├── dataset.yaml
@@ -29,6 +30,7 @@
 │   ├── base.py
 │   └── transformer.py
 └── utils
+```
 
 Above is the project structure for a Transformer-based machine translation model using the Multi30k dataset. I provide the preprocessed data and vocabulary files in the `data/multi30k/processed` directory. The raw dataset can be downloaded from the [Multi30k Dataset](https://github.com/multi30k/dataset) or loaded from the torchtext library.
 
