@@ -35,6 +35,9 @@
 Above is the project structure for a Transformer-based machine translation model using the Multi30k dataset. I provide the preprocessed data and vocabulary files in the `data/multi30k/processed` directory. The raw dataset can be downloaded from the [Multi30k Dataset](https://github.com/multi30k/dataset) or loaded from the torchtext library.
 
 ## Environment Setup
+
+* python >= 3.10
+
 ```bash
 pip install -r requirements.txt
 ```
