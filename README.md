@@ -60,5 +60,5 @@ python main.py --mode train --gpu 0
 To test the model, run:
 
 ```bash
-python main.py --mode test --gpu 0
+python main.py --mode test --gpu 0 --pretrained True
 ```
